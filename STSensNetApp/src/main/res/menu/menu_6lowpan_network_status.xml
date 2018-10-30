@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_updateNetwork"
+        android:icon="@drawable/ic_refresh_24dp"
+        android:title="@string/lowpan_netStatus_refresh"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_networkTopology"
+        android:title="@string/lowpan_netStatus_showTopology" />
+
+    <item
+        android:id="@+id/menu_network_switchOn"
+        android:title="@string/lowpan_netStatus_allLedOn" />
+
+    <item
+        android:id="@+id/menu_network_switchOff"
+        android:title="@string/lowpan_netStatus_allLedOff"
+        android:visible="false"/>
+</menu>

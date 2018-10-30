@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lowpan_details_temperature_name">Temperature</string>
+    <string name="lowpan_details_temperature_format">%.1f C</string>
+    <string name="lowpan_details_pressure_name">Pressure</string>
+    <string name="lowpan_details_pressure_format">%.1f mbar</string>
+    <string name="lowpan_details_humidity_name">Humidity</string>
+    <string name="lowpan_details_humidity_format">%.1f %%</string>
+    <string name="lowpan_details_accelerometer_name">Acceleration</string>
+    <string name="lowpan_details_accelerometer_format">(x: %.0f, y: %.0f, z: %.0f) mG</string>
+    <string name="lowpan_details_gyroscope_name">Gyroscope</string>
+    <string name="lowpan_details_gyroscope_format">(x: %.1f, y: %.1f, z: %.1f) dps</string>
+    <string name="lowpan_details_magnetometer_name">Magnetometer</string>
+    <string name="lowpan_details_magnetometer_format">(x: %.0f, y: %.0f, z: %.0f) mGa</string>
+    <string name="lowpan_details_ledStatus_name">Led Status</string>
+
+</resources>

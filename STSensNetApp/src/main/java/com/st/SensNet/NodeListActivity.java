@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017  STMicroelectronics – All rights reserved
+ * Copyright (c) 2018  STMicroelectronics – All rights reserved
  * The STMicroelectronics corporate logo is a trademark of STMicroelectronics
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -34,11 +34,9 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
  * OF SUCH DAMAGE.
  */
-
 package com.st.SensNet;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -49,22 +47,29 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.st.BlueSTSDK.Feature;
 import com.st.BlueSTSDK.Manager;
 import com.st.BlueSTSDK.Node;
+import com.st.BlueSTSDK.Utils.ConnectionOption;
 import com.st.BlueSTSDK.Utils.InvalidFeatureBitMaskException;
-import com.st.SensNet.demos.features.CommandFeature;
-import com.st.SensNet.demos.features.GenericRemoteFeature;
+import com.st.SensNet.net6LoWPAN.Demo6LowPANActivity;
+import com.st.SensNet.net6LoWPAN.features.Feature6LoWPANProtocol;
+import com.st.SensNet.net6LoWPAN.features.SixLoWPANBLEGatewayConfiguration;
+import com.st.SensNet.netBle.DemosBleActivity;
+import com.st.STM32WB.p2pDemo.DemoSTM32WBActivity;
+import com.st.SensNet.netBle.features.CommandFeature;
+import com.st.SensNet.netBle.features.GenericRemoteFeature;
+import com.st.STM32WB.p2pDemo.Peer2PeerDemoConfiguration;
 
 /**
  * Display only the nodes that are running with a Nucleo of type 0x81 (BleStar1 FW)
  */
 public class NodeListActivity extends com.st.BlueSTSDK.gui.NodeListActivity {
 
-    private static final byte REMOTE_NODE_ID =(byte)0x81;
+    private static final byte BLE_STAR_NODE_ID =(byte)0x81;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +77,16 @@ public class NodeListActivity extends com.st.BlueSTSDK.gui.NodeListActivity {
         SparseArray<Class<? extends Feature>> temp = new SparseArray<>();
         temp.append(0x00080000, GenericRemoteFeature.class);
         temp.append(0x00040000, CommandFeature.class);
+        temp.append(0x00020000, Feature6LoWPANProtocol.class);
+        //todo add stm32wb
         try {
-            Manager.addFeatureToNode(REMOTE_NODE_ID,temp);
+            Manager.addFeatureToNode(BLE_STAR_NODE_ID,temp);
         } catch (InvalidFeatureBitMaskException e) {
             e.printStackTrace();
         }
+
+        SixLoWPANBLEGatewayConfiguration.registerFeature();
+
     }
 
     private final static String DIALOG_SHOWN = NodeListActivity.class.getCanonicalName()+".DIALOG_SHOWN";
@@ -90,12 +100,8 @@ public class NodeListActivity extends com.st.BlueSTSDK.gui.NodeListActivity {
     private View loadInfoDialogView(){
         final SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
         View infoLayout = LayoutInflater.from(this).inflate(R.layout.dialog_update_fw_warnings, null);
-        ((CheckBox)infoLayout.findViewById(R.id.dialogInfo_showAgainCheckBox)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                setDialogShown(prefs,checked);
-            }
-        });
+        ((CheckBox)infoLayout.findViewById(R.id.dialogInfo_showAgainCheckBox))
+                .setOnCheckedChangeListener((compoundButton, checked) -> setDialogShown(prefs,checked));
         return infoLayout;
     }
 
@@ -114,12 +120,9 @@ public class NodeListActivity extends com.st.BlueSTSDK.gui.NodeListActivity {
         //Other dialog code
         alertDialog.setPositiveButton(android.R.string.ok,null);
 
-        alertDialog.setNeutralButton(R.string.infoDialog_siteButtonName, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                String url = getResources().getString(R.string.infoDialog_updateUrl);
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-            }
+        alertDialog.setNeutralButton(R.string.infoDialog_siteButtonName, (dialogInterface, i) -> {
+            String url = getResources().getString(R.string.infoDialog_updateUrl);
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         });
 
         AlertDialog dialog = alertDialog.show();
@@ -136,9 +139,15 @@ public class NodeListActivity extends com.st.BlueSTSDK.gui.NodeListActivity {
         showInfoDialog();
     }
 
+    private boolean isBleStarNode(Node n){
+        return n.getType() == Node.Type.NUCLEO && n.getTypeId() == BLE_STAR_NODE_ID;
+    }
+
     @Override
     public boolean displayNode(Node n) {
-        return n.getType()== Node.Type.NUCLEO && n.getTypeId()==REMOTE_NODE_ID;
+        return Peer2PeerDemoConfiguration.isValidNode(n) ||
+                isBleStarNode(n) ||
+                SixLoWPANBLEGatewayConfiguration.isValidNode(n);
     }
 
     /**
@@ -147,7 +156,20 @@ public class NodeListActivity extends com.st.BlueSTSDK.gui.NodeListActivity {
      */
     @Override
     public void onNodeSelected(Node n) {
-        startActivity(DemosActivity.getStartIntent(this,n,clearCacheIsSelected()));
+
+        ConnectionOption option = ConnectionOption.builder()
+                .enableAutoConnect(true)
+                .resetCache(clearCacheIsSelected())
+                .build();
+        if(Peer2PeerDemoConfiguration.isValidNode(n)){
+            n.addExternalCharacteristics(Peer2PeerDemoConfiguration.getCharacteristicMapping());
+            startActivity(DemoSTM32WBActivity.getStartIntent(this,n,option));
+        }else if (isBleStarNode(n)) {
+            startActivity(DemosBleActivity.getStartIntent(this, n, option));
+        }else if (SixLoWPANBLEGatewayConfiguration.isValidNode(n)){
+            startActivity(Demo6LowPANActivity.getStartIntent(this,n,option));
+        }
+
     }
 
 }

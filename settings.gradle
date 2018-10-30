@@ -1,2 +1,3 @@
-include ':BlueSTSDK',':BlueSTSDKGui', ':STSensNetApp'
+include ':BlueSTSDK',':BlueSTSDK_Gui_Android', ':STSensNetApp'
 project(':BlueSTSDK').projectDir = new File('BlueSTSDK/BlueSTSDK')
+project(':BlueSTSDK_Gui_Android').projectDir = new File('BlueSTSDKGui')

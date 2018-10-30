@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="lowpan_topology_error">Impossible to recovery the information</string>
+    <string name="lowpan_topology_title">Network Topology</string>
+
+</resources>

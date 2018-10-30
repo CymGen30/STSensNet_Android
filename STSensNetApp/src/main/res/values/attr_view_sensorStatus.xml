@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SensorStatusView">
+        <attr name="sensorStatusImg" format="reference" />
+        <attr name="sensorStatusName" format="string" />
+    </declare-styleable>
+
+</resources>

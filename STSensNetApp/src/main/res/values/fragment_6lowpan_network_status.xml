@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lowpan_activityName">6LowPAN BLE Router</string>
+    <string name="lowpan_netStatus_error">Impossible to recovery the information</string>
+    <string name="lowpan_netStatus_refresh">Update Network</string>
+    <string name="lowpan_netStatus_showTopology">Show Topology</string>
+    <string name="lowpan_netStatus_allLedOn">All Led On</string>
+    <string name="lowpan_netStatus_allLedOff">All Led Off</string>
+    <string name="lowpan_netStatus_ledError">Impossible update the led status</string>
+
+</resources>

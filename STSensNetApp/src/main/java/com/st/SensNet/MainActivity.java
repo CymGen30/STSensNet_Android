@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017  STMicroelectronics – All rights reserved
+ * Copyright (c) 2018  STMicroelectronics – All rights reserved
  * The STMicroelectronics corporate logo is a trademark of STMicroelectronics
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -34,16 +34,38 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
  * OF SUCH DAMAGE.
  */
-
 package com.st.SensNet;
 
 import android.content.Intent;
 import android.view.View;
 
+import com.st.BlueSTSDK.gui.AboutActivity;
+import com.st.BlueSTSDK.gui.thirdPartyLibLicense.LibLicense;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+
 /**
  * open the scanning activity or the about activity
  */
 public class MainActivity extends com.st.BlueSTSDK.gui.MainActivity {
+    private static final String ABOUT_PAGE_URL = "file:///android_asset/about.html";
+    private static final String PRIVACY_PAGE_URL = "http://www.st.com/content/st_com/en/common/privacy-policy.html";
+
+    private static final ArrayList<LibLicense> LIB_LICENSES = new ArrayList<>();
+    static {
+        LIB_LICENSES.add(new LibLicense("Android Design Support Library",R.raw.lic_android_support));
+        LIB_LICENSES.add(new LibLicense("Android Support Library v13",R.raw.lic_android_support));
+        LIB_LICENSES.add(new LibLicense("Android Annotations Support Library",R.raw.lic_android_support));
+        LIB_LICENSES.add(new LibLicense("Android Support Card View Library",R.raw.lic_android_support));
+        LIB_LICENSES.add(new LibLicense("Android Support Constraint Layout Library",R.raw.lic_android_support));
+        LIB_LICENSES.add(new LibLicense("Android Support AppCompat Library",R.raw.lic_android_support));
+        LIB_LICENSES.add(new LibLicense("Android Support GridLayout Library",R.raw.lic_android_support));
+        LIB_LICENSES.add(new LibLicense("Android Support RecyclerView Library",R.raw.lic_android_support));
+        LIB_LICENSES.add(new LibLicense("BlueSTSDK",R.raw.lic_bluestsdk));
+        LIB_LICENSES.add(new LibLicense("BlueSTSDK Gui",R.raw.lic_bluestsdk_gui));
+    }
 
     @Override
     public void startScanBleActivity(View view) {
@@ -52,6 +74,15 @@ public class MainActivity extends com.st.BlueSTSDK.gui.MainActivity {
 
     @Override
     public void startAboutActivity(View view) {
-        startActivity(new Intent(this,AboutActivity.class));
+        AboutActivity.startActivityWithAboutPage(this,ABOUT_PAGE_URL,null,LIB_LICENSES);
+    }
+
+    @Override
+    public URL getPrivacyPolicyUrl(){
+        try {
+            return new URL(PRIVACY_PAGE_URL);
+        } catch (MalformedURLException e) {
+            return null;
+        }//try-catch
     }
 }
